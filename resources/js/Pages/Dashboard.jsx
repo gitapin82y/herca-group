@@ -1,4 +1,5 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import KomisiList from '@/Components/KomisiList';
 import { Head } from '@inertiajs/react';
 
 export default function Dashboard() {
@@ -21,6 +22,9 @@ export default function Dashboard() {
                     </div>
                 </div>
             </div>
+
+            <KomisiList />
+
         </AuthenticatedLayout>
     );
 }

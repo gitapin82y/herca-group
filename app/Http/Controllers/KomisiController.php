@@ -3,53 +3,61 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\Marketing;
+use App\Models\Penjualan;
+use Exception;
 
 class KomisiController extends Controller
 {
-    public function hitungKomisi()
+    public function index()
     {
-        $marketings = Marketing::all();
-        $result = [];
+        try {
+            $komisi_data = [];
 
-        foreach ($marketings as $marketing) {
-            $penjualanMei = Penjualan::where('marketing_id', $marketing->id)
-                ->whereBetween('date', ['2023-05-01', '2023-05-31'])
-                ->sum('grand_total');
+            $marketings = Marketing::all();
+            foreach ($marketings as $marketing) {
+                $omzet_per_bulan = Penjualan::selectRaw('MONTH(date) as bulan, SUM(grand_total) as omzet')
+                ->where('marketing_id', $marketing->id)
+                ->groupByRaw('YEAR(date), MONTH(date)')
+                ->orderByRaw('YEAR(date) ASC, MONTH(date) ASC')
+                ->get();
 
-            $penjualanJuni = Penjualan::where('marketing_id', $marketing->id)
-                ->whereBetween('date', ['2023-06-01', '2023-06-30'])
-                ->sum('grand_total');
 
-            $result[] = [
-                'marketing' => $marketing->name,
-                'bulan' => 'Mei',
-                'omzet' => $penjualanMei,
-                'komisi_persen' => $this->hitungPersenKomisi($penjualanMei),
-                'komisi_nominal' => $this->hitungNominalKomisi($penjualanMei),
-            ];
+                foreach ($omzet_per_bulan as $omzet) {
+                    $komisi_persen = 0;
+                    if ($omzet->omzet >= 500000000) {
+                        $komisi_persen = 10;
+                    } elseif ($omzet->omzet >= 200000000) {
+                        $komisi_persen = 5;
+                    } elseif ($omzet->omzet >= 100000000) {
+                        $komisi_persen = 2.5;
+                    }
 
-            $result[] = [
-                'marketing' => $marketing->name,
-                'bulan' => 'Juni',
-                'omzet' => $penjualanJuni,
-                'komisi_persen' => $this->hitungPersenKomisi($penjualanJuni),
-                'komisi_nominal' => $this->hitungNominalKomisi($penjualanJuni),
-            ];
+                    $komisi_nominal = ($komisi_persen / 100) * $omzet->omzet;
+
+                    $komisi_data[] = [
+                        'marketing' => $marketing->name,
+                        'bulan' => $omzet->bulan,
+                        'omzet' => $omzet->omzet,
+                        'komisi_persen' => $komisi_persen,
+                        'komisi_nominal' => $komisi_nominal
+                    ];
+                }
+            }
+
+            return response()->json([
+                'status' => 'success',
+                'code' => 200,
+                'message' => 'Data retrieved successfully',
+                'data' => $komisi_data
+            ], 200);
+        } catch (Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'code' => 500,
+                'message' => 'Something went wrong',
+                'data' => null
+            ], 500);
         }
-
-        return response()->json($result);
-    }
-
-    private function hitungPersenKomisi($omzet)
-    {
-        if ($omzet >= 500000000) return 10;
-        if ($omzet >= 200000000) return 5;
-        if ($omzet >= 100000000) return 2.5;
-        return 0;
-    }
-
-    private function hitungNominalKomisi($omzet)
-    {
-        return $omzet * ($this->hitungPersenKomisi($omzet) / 100);
     }
 }

@@ -13,14 +13,13 @@ return new class extends Migration
     {
         Schema::create('penjualan', function (Blueprint $table) {
             $table->id();
-            $table->string('transaction_number');
-            $table->unsignedBigInteger('marketing_id');
+            $table->string('transaction_number')->unique();
             $table->date('date');
-            $table->integer('cargo_fee');
-            $table->bigInteger('total_balance');
-            $table->bigInteger('grand_total');
+            $table->decimal('cargo_fee', 15, 2);
+            $table->decimal('total_balance', 15, 2);
+            $table->decimal('grand_total', 15, 2);
             $table->timestamps();
-            $table->foreign('marketing_id')->references('id')->on('marketing')->onDelete('cascade');
+            $table->foreignId('marketing_id')->constrained('marketing')->onDelete('cascade');
         });
     }
 

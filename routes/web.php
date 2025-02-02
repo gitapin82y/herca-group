@@ -4,6 +4,13 @@ use App\Http\Controllers\ProfileController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
+use App\Http\Controllers\KomisiController;
+use App\Http\Controllers\PembayaranController;
+
+Route::get('/komisi', [KomisiController::class, 'index']);
+Route::post('/pembayaran', [PembayaranController::class, 'store']);
+Route::get('/pembayaran', [PembayaranController::class, 'index']);
+
 
 Route::get('/', function () {
     return Inertia::render('Welcome', [
