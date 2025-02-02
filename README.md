@@ -2,8 +2,11 @@
 
 Aplikasi ini digunakan untuk menghitung komisi bulanan berdasarkan omzet yang dihasilkan oleh setiap marketing. Data omzet akan diambil dari tabel penjualan dan dihitung berdasarkan persentase komisi yang telah ditentukan. Aplikasi ini menggunakan **Laravel** sebagai backend dan **React** untuk frontend.
 
-## Fitur
+## Postman
 
+https://documenter.getpostman.com/view/41732695/2sAYX3rPQW
+
+## Fitur
 - Menampilkan daftar marketing beserta omzet dan komisi per bulan.
 - Menghitung komisi berdasarkan omzet yang dihasilkan.
 - Rest API, Create Pembayaran and Get all Pembayaran & Komisi.
@@ -45,3 +48,4 @@ DB_PASSWORD=
 6. jalankan laravel : php artisan serve
 7. Instal Dependensi Frontend : npm install
 8. Jalankan server frontend react : npm run dev
+
